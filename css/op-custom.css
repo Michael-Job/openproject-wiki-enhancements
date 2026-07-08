@@ -1,0 +1,184 @@
+/* ============================================================
+   OpenProject Wiki – Custom CSS Injection
+   Tested with: OpenProject Community 16.6.3, Apache 2.4.52, Ubuntu 22.04
+   Injected via Apache mod_substitute (see /apache/op-custom-vhost.conf).
+
+   Works on wiki content rendered with op-uc-* classes.
+   App chrome (header, sidebar colors) is left at OP default —
+   those selectors are more fragile and change between versions.
+
+   HOW TO CUSTOMIZE:
+   1. Replace the CSS variable values in section 0 with your own colors.
+   2. Add or replace the @font-face block (section 1) with your own font,
+      or remove it to use the system font stack.
+   3. Tune readable width and font size in section 2.
+   ============================================================ */
+
+/* ---- 0 · Color variables — replace with your brand colors ---- */
+:root {
+  --custom-primary:     #2A6EBB;   /* e.g. headings H1, accent */
+  --custom-secondary:   #1A4A7A;   /* e.g. headings H2/H3, table header */
+  --custom-text:        #333333;   /* body text */
+  --custom-code-bg:     #f5f5f5;
+  --custom-code-border: #e0e0e0;
+}
+
+/* ---- 1 · Custom font via self-hosted woff2 ----
+   Place font files under your static asset directory (e.g. /op-custom/fonts/).
+   Remove this block entirely to use the OP default font (Lato). */
+@font-face {
+  font-family: "YourFont";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/op-custom/fonts/YourFont-Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "YourFont";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/op-custom/fonts/YourFont-SemiBold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "YourFont";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/op-custom/fonts/YourFont-Bold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "YourFont";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/op-custom/fonts/YourFont-Italic.woff2") format("woff2");
+}
+
+/* ---- 2 · Wiki content: base font, readable width, body text ----
+   Double class + !important is required: OP's default font-family rule
+   wins over a single-class selector. This is the reliable override pattern. */
+.op-uc-container.op-uc-container {
+  font-family: "YourFont", system-ui, -apple-system, sans-serif !important;
+  color: var(--custom-text);
+  line-height: 1.6;
+  font-size: 1.05rem;   /* increase slightly for readability; tune to taste */
+  max-width: 110ch;     /* limits line length; remove if you prefer full width */
+  margin-left: auto;    /* centers the content block */
+  margin-right: auto;
+}
+
+/* ---- 3 · Headings ---- */
+.op-uc-container h1,
+.op-uc-container .op-uc-h1 {
+  color: var(--custom-primary);
+  font-weight: 700;
+  margin: 1.6em 0 0.6em;
+  line-height: 1.25;
+  border-bottom: none;   /* removes OP's default rule under H1 */
+  padding-bottom: 0;
+}
+.op-uc-container h2,
+.op-uc-container .op-uc-h2 {
+  color: var(--custom-secondary);
+  font-weight: 600;
+  margin: 1.8em 0 0.6em;
+  padding-bottom: 0.3em;
+  border-bottom: 2px solid var(--custom-primary);   /* decorative rule under H2 */
+  line-height: 1.3;
+}
+.op-uc-container h3,
+.op-uc-container .op-uc-h3 {
+  color: var(--custom-secondary);
+  font-weight: 600;
+  margin: 1.1em 0 0.4em;
+}
+
+/* ---- 4 · Lists: spacing between items ---- */
+.op-uc-container ul,
+.op-uc-container ol {
+  margin: 0.8em 2em;
+}
+.op-uc-container li {
+  margin-bottom: 0.5em;
+  line-height: 1.6;
+}
+.op-uc-container li:last-child {
+  margin-bottom: 0;
+}
+
+/* ---- 5 · Table of contents ({{toc}} macro) ----
+   OP places it float:right by default — we keep that.
+   max-width prevents very long page titles from breaking vertically. */
+.op-uc-toc {
+  max-width: 35%;
+}
+.op-uc-toc li {
+  margin-bottom: 0;
+}
+.op-uc-toc ul,
+.op-uc-toc ol {
+  margin: 0;
+}
+
+/* ---- 6 · Code blocks & inline code ---- */
+.op-uc-container pre,
+.op-uc-container .op-uc-code_block {
+  background: var(--custom-code-bg);
+  border: 1px solid var(--custom-code-border);
+  border-radius: 6px;
+  padding: 12px 14px;
+  font-family: Consolas, "JetBrains Mono", "Courier New", monospace;
+  font-size: 0.9em;
+  line-height: 1.5;
+  overflow-x: auto;
+}
+.op-uc-container code {
+  background: var(--custom-code-bg);
+  border: 1px solid var(--custom-code-border);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+  font-family: Consolas, "JetBrains Mono", "Courier New", monospace;
+  font-size: 0.9em;
+}
+.op-uc-container pre code {
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+/* ---- 7 · Tables ---- */
+.op-uc-container table th,
+.op-uc-container .op-uc-table th {
+  background: var(--custom-secondary);
+  color: #ffffff;
+  font-weight: 600;
+}
+.op-uc-container table,
+.op-uc-container .op-uc-table {
+  border-collapse: collapse;
+}
+.op-uc-container table td,
+.op-uc-container table th {
+  border: 1px solid #dddddd;
+  padding: 6px 10px;
+}
+
+/* ---- 8 · Blockquotes / hint boxes ---- */
+.op-uc-container blockquote,
+.op-uc-container .op-uc-blockquote {
+  border-left: 4px solid var(--custom-primary);
+  background: #f9f9f9;
+  margin: 1em 0;
+  padding: 1em 1.2em;
+  color: var(--custom-text);
+}
+
+/* ---- 9 · Links ---- */
+.op-uc-container a {
+  color: var(--custom-secondary);
+  text-decoration: underline;
+}
+.op-uc-container a:hover {
+  color: var(--custom-primary);
+}
